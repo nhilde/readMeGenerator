@@ -2,7 +2,7 @@
 
 // TODO: Create an array of questions for user input
 const inquirer = require('inquirer');
-
+const fs = require('fs');
 
 const askUser = () => {
   return inquirer.prompt([
@@ -28,11 +28,6 @@ const askUser = () => {
     },
     {
       type: 'input',
-      message: 'Enter the file path to the application demonstration',
-      name: 'demo',
-    },
-    {
-      type: 'input',
       message: 'Enter any credits',
       name: 'credits',
     },
@@ -42,14 +37,9 @@ const askUser = () => {
       name: 'license',
       choices: [
         'MIT',
-        'GNU GPLv3',
+        'GPLv3',
         'ISC',
       ]
-    },
-    {
-      type: 'input',
-      message: 'Do you want to inlcude any badges?',
-      name: 'badges',
     },
     {
       type: 'input',
@@ -81,13 +71,13 @@ const askUser = () => {
 
 
 // TODO: Create a function to write README file
-const generateMarkdown = ({ projectName, description, installation, usage, demo, credits, license, features, contribute, tests, email, github, badges }) => {
+const generateMarkdown = (answers) => {
 
-  `# ${projectName}
+  return `# ${answers.projectName} [![License: ${answers.license}](https://img.shields.io/badge/License-${answers.license}-yellow.svg)](https://opensource.org/licenses/${answers.license})
 
   ## Description
   
-  ${description}
+  ${answers.description}
   
   ## Table of Contents
   
@@ -95,50 +85,46 @@ const generateMarkdown = ({ projectName, description, installation, usage, demo,
   - [Usage](#usage)
   - [Credits](#credits)
   - [License](#license)
-  - [Badges](#badges)
   - [Features](#features)
-  - [How to Contribute](#how to contribute)
+  - [How to Contribute](#how-to-contribute)
   - [Tests](#tests)
   - [Questions](#questions)
   
   ## Installation
   
-  ${installation}
+  ${answers.installation}
   
   ## Usage
   
-  ${usage}
-
-      ![${projectName}](${demo})
+  ${answers.usage}
       
   
   ## Credits
   
-  ${credits}
+  ${answers.credits}
   
   ## License
   
-  Licensed under the ${license} license
+  Licensed under the [${answers.license} license] (LICENSE)
   
-  ## Badges
-  
-  ${badges}
   
   ## Features
   
-  ${features}
+  ${answers.features}
   
   ## How to Contribute
   
-  ${contribute}
+  ${answers.contribute}
   
   ## Tests
 
-  ${tests}
+  ${answers.tests}
 
   ## Questions
 
-  For any further information, you can email me at ${email} or my GitHub username ${github}
+  For any further information, you can reach me at: <br>
+  email: ${answers.email} <br>
+  github: ${answers.github}
 
 `
 }
@@ -146,7 +132,10 @@ const generateMarkdown = ({ projectName, description, installation, usage, demo,
 // TODO: Create a function to initialize app
 function init() {
   askUser()
- }
+  .then((answers) => fs.writeFileSync('../demoREADME/README.md', generateMarkdown(answers)))
+    .then(() => console.log('Successfully generated a README.md'))
+    .catch((err) => console.error(err));
+ };
 
 // Function call to initialize app
 init()
